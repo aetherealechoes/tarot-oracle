@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="description" content="Tarot Oracle — Mystical guidance through the cards, personalized by your astrological sign, numerology, and the energies of the day.">
+  <meta name="theme-color" content="#0a0a12">
+  <title>Tarot Oracle</title>
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Cinzel+Decorative:wght@400;700&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&display=swap" rel="stylesheet">
+
+  <!-- Styles -->
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <!-- ════════════════════════════════════════════════════════ -->
+  <!-- Background Particles -->
+  <!-- ════════════════════════════════════════════════════════ -->
+  <div class="particles" id="particles"></div>
+
+  <!-- ════════════════════════════════════════════════════════ -->
+  <!-- SCREEN: Onboarding -->
+  <!-- ════════════════════════════════════════════════════════ -->
+  <div id="screen-onboarding" class="screen">
+    <div class="onboarding-container">
+      <div class="onboarding-card">
+        <div class="onboarding-header">
+          <h1 class="app-logo" data-i18n="appTitle">Tarot Oracle</h1>
+          <p class="subtitle" data-i18n="welcomeSubtitle">Let us attune the Oracle to your cosmic signature</p>
+        </div>
+
+        <div class="onboarding-body">
+          <!-- Language Selection -->
+          <div class="form-group">
+            <label data-i18n="language">Language</label>
+            <div class="language-selector" id="onboarding-lang">
+              <button class="lang-btn active" data-action="set-language" data-lang="en">English</button>
+              <button class="lang-btn" data-action="set-language" data-lang="fr">Français</button>
+              <button class="lang-btn" data-action="set-language" data-lang="es">Español</button>
+            </div>
+          </div>
+
+          <!-- Date of Birth -->
+          <div class="form-group">
+            <label for="dob-input" data-i18n="dobLabel">Date of Birth</label>
+            <input type="date" id="dob-input" class="mystic-input" required>
+          </div>
+
+          <!-- Zodiac & Life Path Preview -->
+          <div id="onboarding-preview" class="profile-preview hidden">
+            <div class="preview-item">
+              <span class="preview-label" data-i18n="yourSign">Your Sign</span>
+              <span class="preview-value" id="preview-zodiac">—</span>
+            </div>
+            <div class="preview-item">
+              <span class="preview-label" data-i18n="lifePathNumber">Life Path Number</span>
+              <span class="preview-value" id="preview-lifepath">—</span>
+            </div>
+          </div>
+
+          <button id="begin-journey-btn" class="btn btn-gold" data-action="begin-journey" disabled>
+            <span data-i18n="beginJourney">Begin Your Journey</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════════════════════════════════════════════════════════ -->
+  <!-- SCREEN: Home -->
+  <!-- ════════════════════════════════════════════════════════ -->
+  <div id="screen-home" class="screen">
+    <div class="home-container">
+      <!-- Header -->
+      <header class="home-header">
+        <h1 class="app-logo" data-i18n="appTitle">Tarot Oracle</h1>
+        <button class="btn-icon" data-action="show-settings" aria-label="Settings">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.32 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+          </svg>
+        </button>
+      </header>
+
+      <!-- Daily Oracle -->
+      <section class="daily-oracle" id="daily-oracle">
+        <h2 class="section-title" data-i18n="dailyOracle">Daily Oracle</h2>
+        <div class="oracle-panel" id="daily-oracle-panel">
+          <!-- Populated by JS -->
+        </div>
+      </section>
+
+      <!-- Spread Selection -->
+      <section class="spread-selection">
+        <h2 class="section-title" data-i18n="chooseSpread">Choose a Spread</h2>
+        <div class="spread-grid" id="spread-grid">
+          <!-- Populated by JS -->
+        </div>
+      </section>
+    </div>
+  </div>
+
+  <!-- ════════════════════════════════════════════════════════ -->
+  <!-- SCREEN: Reading -->
+  <!-- ════════════════════════════════════════════════════════ -->
+  <div id="screen-reading" class="screen">
+    <div class="reading-container">
+      <!-- Reading Header -->
+      <div class="reading-header">
+        <button class="btn-back" data-action="back-home">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M19 12H5M12 19l-7-7 7-7"/>
+          </svg>
+          <span data-i18n="back">Back</span>
+        </button>
+        <h2 class="reading-title" id="reading-title"></h2>
+      </div>
+
+      <!-- Shuffling Animation -->
+      <div id="shuffling-overlay" class="shuffling-overlay hidden">
+        <div class="shuffle-cards">
+          <div class="shuffle-card"></div>
+          <div class="shuffle-card"></div>
+          <div class="shuffle-card"></div>
+        </div>
+        <p class="shuffle-text" data-i18n="shuffling">Shuffling the deck...</p>
+      </div>
+
+      <!-- Card Spread Area -->
+      <div class="spread-area" id="spread-layout">
+        <!-- Cards populated by JS -->
+      </div>
+
+      <!-- Tap hint -->
+      <p class="tap-hint" id="tap-hint" data-i18n="tapToReveal">Tap a card to reveal</p>
+
+      <!-- Interpretation Panel -->
+      <div class="interpretation-panel" id="interpretation-panel">
+        <div class="interp-handle"></div>
+        <div class="interp-content" id="interp-content">
+          <!-- Populated by JS on card reveal -->
+        </div>
+      </div>
+
+      <!-- Reading Summary -->
+      <div class="reading-summary hidden" id="reading-summary-panel">
+        <div class="summary-content" id="summary-content">
+          <!-- Populated by JS after all cards revealed -->
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════════════════════════════════════════════════════════ -->
+  <!-- SCREEN: Card Glossary -->
+  <!-- ════════════════════════════════════════════════════════ -->
+  <div id="screen-glossary" class="screen">
+    <div id="glossary-container"></div>
+  </div>
+
+  <!-- ════════════════════════════════════════════════════════ -->
+  <!-- SCREEN: Numerology Reading -->
+  <!-- ════════════════════════════════════════════════════════ -->
+  <div id="screen-numerology" class="screen">
+    <div id="numerology-container"></div>
+  </div>
+
+  <!-- ════════════════════════════════════════════════════════ -->
+  <!-- SCREEN: Journal & Mirror -->
+  <!-- ════════════════════════════════════════════════════════ -->
+  <div id="screen-journal" class="screen">
+    <div id="journal-container"></div>
+  </div>
+
+  <!-- ════════════════════════════════════════════════════════ -->
+  <!-- SCREEN: Settings -->
+  <!-- ════════════════════════════════════════════════════════ -->
+  <div id="screen-settings" class="screen">
+    <div class="settings-container">
+      <div class="settings-header">
+        <button class="btn-back" data-action="back-home">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M19 12H5M12 19l-7-7 7-7"/>
+          </svg>
+          <span data-i18n="back">Back</span>
+        </button>
+        <h2 data-i18n="settings">Settings</h2>
+      </div>
+
+      <div class="settings-body" id="settings-body">
+        <!-- Language -->
+        <div class="setting-group">
+          <label class="setting-label" data-i18n="language">Language</label>
+          <div class="language-selector" id="settings-lang">
+            <button class="lang-btn" data-action="set-language" data-lang="en">English</button>
+            <button class="lang-btn" data-action="set-language" data-lang="fr">Français</button>
+            <button class="lang-btn" data-action="set-language" data-lang="es">Español</button>
+          </div>
+        </div>
+
+        <!-- Reversals -->
+        <div class="setting-group">
+          <label class="setting-label" data-i18n="reversals">Card Reversals</label>
+          <div class="toggle-row">
+            <label class="toggle-switch">
+              <input type="checkbox" id="toggle-reversals" data-action="toggle-reversals">
+              <span class="toggle-slider"></span>
+            </label>
+            <span class="toggle-desc" id="reversals-desc" data-i18n="reversalsOff">Disabled — all cards appear upright</span>
+          </div>
+        </div>
+        <!-- Reset -->
+        <div class="setting-group setting-danger">
+          <button class="btn btn-danger" data-action="reset-profile">
+            <span data-i18n="resetProfile">Reset Profile</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════════════════════════════════════════════════════════ -->
+  <!-- Scripts (order matters) -->
+  <!-- ════════════════════════════════════════════════════════ -->
+  <script src="js/i18n.js"></script>
+  <script src="js/celestial.js"></script>
+  <script src="js/numerology.js"></script>
+  <script src="js/cards-major.js"></script>
+  <script src="js/cards-minor-1.js"></script>
+  <script src="js/cards-minor-2.js"></script>
+  <script src="js/spreads.js"></script>
+  <script src="js/interpreter.js"></script>
+  <script src="js/journal.js"></script>
+  <script src="js/i18n-social.js"></script>
+  <script src="js/social.js"></script>
+  <script src="js/app.js"></script>
+
+</body>
+</html>
