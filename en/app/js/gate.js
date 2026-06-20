@@ -13,7 +13,7 @@
 (function () {
   'use strict';
 
-  const GATE_ENABLED = false;   // DISABLED: test first
+  const GATE_ENABLED = true;
   const PREFIX     = 'TAROT';
   const BUY_URL    = 'https://etherealjournals.gumroad.com/l/tarot-oracle';
   const GUMROAD_PRODUCT_ID = 'GxrcWsPbDrTSdDFwP_8Bow==';
@@ -22,8 +22,8 @@
   // Public verification key (safe to ship). The matching PRIVATE key
   // lives only in your offline key-generator tool.
   const PUBLIC_JWK = { kty:'EC', crv:'P-256',
-    x:'NSCgc3843sg8R99uym4FH-YMzfEcZ-JHqVGv4igJcWg',
-    y:'3VtWqELlanqVqbrE_qEAvKP3cxiZwfqcIsJC0zLNH-A' };
+    x:'TRQ-jef00FrvuxUvYZw-uUgn4eOKvj5__xGTaRh1m5k',
+    y:'cCRDJroTP8tc_0gxclw9pkBe7XAZ7M-SMh5bpS_xhLA' };
   const MSG = new TextEncoder().encode('TAROT-ORACLE-LIFETIME');
 
   // localStorage keys
