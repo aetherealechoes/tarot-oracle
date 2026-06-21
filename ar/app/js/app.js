@@ -111,7 +111,12 @@ const App = {
           <p class="form-prompt" data-i18n="welcomeSubtitle">${I18N.t('welcomeSubtitle')}</p>
 
           <div class="onboarding-section">
-            <label data-i18n="dobLabel">${I18N.t('dobLabel')}</label>
+            <label data-i18n="dobLabel" style="display:flex;align-items:center;justify-content:space-between;gap:8px;">${I18N.t('dobLabel')}
+              <span style="display:flex;border:1px solid rgba(255,255,255,0.25);border-radius:6px;overflow:hidden;font-size:12px;font-family:serif;">
+                <button id="tarot-dialect-lv" onclick="window._setTarotDialect('lv')" style="background:transparent;color:rgba(255,255,255,0.6);border:none;padding:4px 9px;cursor:pointer;font-family:serif;">فصحى</button>
+                <button id="tarot-dialect-eg" onclick="window._setTarotDialect('eg')" style="background:rgba(255,255,255,0.15);color:#fff;border:none;padding:4px 9px;cursor:pointer;font-family:serif;">مصري</button>
+              </span>
+            </label>
             <input type="hidden" id="dob-input" />
             <div class="dob-roller" id="dob-roller">
               <div class="roller-highlight"></div>
@@ -212,6 +217,7 @@ const App = {
 
     // ── Rolling date picker ──────────────────────────────────
     this._initDobRoller(updatePreview);
+    setTimeout(() => this._initDialectToggle(), 100);
 
     // Name input handler
     const nameInput = document.getElementById('name-input');
@@ -234,7 +240,9 @@ const App = {
     const ITEM_H = 44;
     const PAD = 2;
 
-    const months = ['كانون الثاني','شباط','آذار','نيسان','أيّار','حزيران','تمّوز','آب','أيلول','تشرين الأول','تشرين الثاني','كانون الأول'];
+    const MONTHS_EG = ['يناير','فبراير','مارس','أبريل','مايو','يونيو','يوليو','أغسطس','سبتمبر','أكتوبر','نوفمبر','ديسمبر'];
+    const MONTHS_LV = ['كانون الثاني','شباط','آذار','نيسان','أيّار','حزيران','تمّوز','آب','أيلول','تشرين الأول','تشرين الثاني','كانون الأول'];
+    const months = (localStorage.getItem('ee_ar_month_dialect') || 'eg') === 'eg' ? MONTHS_EG : MONTHS_LV;
 
     const currentYear = new Date().getFullYear();
     const years = [];
@@ -340,6 +348,30 @@ const App = {
       if (yr1990 >= 0) yearCol.scrollTop = yr1990 * ITEM_H;
       [dayCol, monthCol, yearCol].forEach(highlightSelected);
     }, 50);
+  },
+
+  // ── 4c. Month Dialect Toggle ────────────────────────────────
+  _initDialectToggle() {
+    const MONTHS_EG = ['يناير','فبراير','مارس','أبريل','مايو','يونيو','يوليو','أغسطس','سبتمبر','أكتوبر','نوفمبر','ديسمبر'];
+    const MONTHS_LV = ['كانون الثاني','شباط','آذار','نيسان','أيّار','حزيران','تمّوز','آب','أيلول','تشرين الأول','تشرين الثاني','كانون الأول'];
+    const ITEM_H = 44;
+    window._setTarotDialect = (d) => {
+      localStorage.setItem('ee_ar_month_dialect', d);
+      const lv = document.getElementById('tarot-dialect-lv');
+      const eg = document.getElementById('tarot-dialect-eg');
+      if (lv) { lv.style.background = d==='lv'?'rgba(255,255,255,0.15)':'transparent'; lv.style.color = d==='lv'?'#fff':'rgba(255,255,255,0.6)'; }
+      if (eg) { eg.style.background = d==='eg'?'rgba(255,255,255,0.15)':'transparent'; eg.style.color = d==='eg'?'#fff':'rgba(255,255,255,0.6)'; }
+      const monthCol = document.getElementById('roller-month');
+      if (monthCol) {
+        const prevIdx = Math.round(monthCol.scrollTop / ITEM_H);
+        const months = d === 'eg' ? MONTHS_EG : MONTHS_LV;
+        monthCol.querySelectorAll('.roller-item:not(.roller-pad)').forEach((el, i) => { el.textContent = months[i]; });
+        monthCol.scrollTop = prevIdx * ITEM_H;
+      }
+    };
+    // Init state
+    const saved = localStorage.getItem('ee_ar_month_dialect') || 'eg';
+    window._setTarotDialect(saved);
   },
 
   // ── 5. Update UI Language ────────────────────────────────────
