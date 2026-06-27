@@ -318,7 +318,7 @@ const MAJOR_ARCANA = [
     "id": "the-chariot",
     "number": 7,
     "numeral": "VII",
-    "image": "images/cards/major/7 The Chariot.png",
+    "image": "images/cards/major/7 The Chariot.jpg",
     "element": "water",
     "planet": null,
     "zodiac": "cancer",
