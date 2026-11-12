@@ -15,7 +15,32 @@
 
   const GATE_ENABLED = false;  // Blocking gate disabled — soft banner only
   const PREFIX     = 'TAROT';
-  const BUY_URL    = 'https://etherealjournals.gumroad.com/l/tarot-oracle-ar';
+  const BUY_URL_INSTA  = 'https://etherealjournals.gumroad.com/l/tarot-oracle-ar/INSTA';
+  const BUY_URL_TIKTOK = 'https://etherealjournals.gumroad.com/l/tarot-oracle-ar?offer_code=TIKTOK';
+  const BUY_URL_DEFAULT= 'https://etherealjournals.gumroad.com/l/tarot-oracle-ar/INSTA';
+
+  // Detect traffic source from UTM params or referrer, persist it
+  function detectSource() {
+    const stored = localStorage.getItem('tarot_source');
+    if (stored) return stored;
+    const params = new URLSearchParams(window.location.search);
+    const utm = (params.get('utm_source') || '').toLowerCase();
+    const ref = (document.referrer || '').toLowerCase();
+    let source = 'default';
+    if (utm.includes('tiktok') || ref.includes('tiktok')) source = 'tiktok';
+    else if (utm.includes('ig') || utm.includes('instagram') || ref.includes('instagram')) source = 'instagram';
+    localStorage.setItem('tarot_source', source);
+    return source;
+  }
+
+  function getBuyUrl() {
+    const src = detectSource();
+    if (src === 'tiktok') return BUY_URL_TIKTOK;
+    if (src === 'instagram') return BUY_URL_INSTA;
+    return BUY_URL_DEFAULT;
+  }
+
+  const BUY_URL = BUY_URL_DEFAULT; // kept for legacy gate overlay references
   const GUMROAD_PRODUCT_ID = '7UyqliUsUg1wJOYosw779g==';
   const TRIAL_DAYS = 7;
 
@@ -242,7 +267,7 @@
       '<div class="tsb-inner">' +
         '<span class="tsb-moon">🌙</span>' +
         '<span class="tsb-text">أعجبتك التجربة؟ افتح أوراكل التاروت بالكامل — ٧٨ بطاقة، ٦ نشرات، ومزيد</span>' +
-        '<a class="tsb-cta" href="' + BUY_URL + '" target="_blank" rel="noopener">احصل عليه الآن ✦</a>' +
+        '<a class="tsb-cta" href="' + getBuyUrl() + '" target="_blank" rel="noopener">احصل عليه الآن ✦</a>' +
         '<button class="tsb-close" aria-label="إغلاق">✕</button>' +
       '</div>';
     document.body.appendChild(b);
