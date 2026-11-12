@@ -13,7 +13,7 @@
 (function () {
   'use strict';
 
-  const GATE_ENABLED = true;
+  const GATE_ENABLED = false;  // Blocking gate disabled — soft banner only
   const PREFIX     = 'TAROT';
   const BUY_URL    = 'https://etherealjournals.gumroad.com/l/tarot-oracle-ar';
   const GUMROAD_PRODUCT_ID = '7UyqliUsUg1wJOYosw779g==';
@@ -137,6 +137,23 @@
         background:rgba(20,16,40,.85);border:1px solid rgba(201,168,76,.3);
         box-shadow:0 4px 16px rgba(0,0,0,.4);transition:opacity 1s ease;pointer-events:none;}
       .tarot-trial-badge.fade{opacity:0;}
+
+      /* ── Soft banner ── */
+      .tarot-soft-banner{position:fixed;bottom:0;left:0;right:0;z-index:9500;
+        padding:.85rem 1rem;background:rgba(14,11,28,.96);border-top:1px solid rgba(201,168,76,.3);
+        box-shadow:0 -4px 24px rgba(0,0,0,.5);animation:tgFade .5s ease;direction:rtl;}
+      .tsb-inner{display:flex;align-items:center;justify-content:center;gap:.8rem;flex-wrap:wrap;
+        max-width:600px;margin:0 auto;font-family:'Cormorant Garamond','Amiri',serif;}
+      .tsb-moon{font-size:1.2rem;flex-shrink:0;}
+      .tsb-text{color:var(--text-light,#c4b69c);font-size:.95rem;line-height:1.4;flex:1;min-width:0;}
+      .tsb-cta{display:inline-block;padding:.45rem .9rem;border-radius:8px;text-decoration:none;
+        font-family:'Cinzel','Amiri',serif;font-size:.82rem;letter-spacing:.04em;white-space:nowrap;
+        color:#1a1228;background:linear-gradient(135deg,#e8c547,#c9a84c);
+        transition:transform .2s,box-shadow .2s;flex-shrink:0;}
+      .tsb-cta:hover{transform:translateY(-1px);box-shadow:0 4px 14px rgba(201,168,76,.4);}
+      .tsb-close{background:none;border:none;cursor:pointer;color:var(--text-muted,#8a7e6a);
+        font-size:1rem;padding:.2rem .4rem;flex-shrink:0;line-height:1;transition:color .2s;}
+      .tsb-close:hover{color:var(--text-cream,#e8dcc8);}
     `;
     document.head.appendChild(s);
   }
@@ -208,6 +225,44 @@
     setTimeout(function () { b.classList.add('fade'); }, 6000);
   }
 
+  // ── Soft banner — shown after FREE_READINGS full spreads ──
+  const K_COUNT      = 'tarot_readings_count';
+  const K_DISMISSED  = 'tarot_banner_dismissed';
+  const FREE_READINGS = 7;
+  const MULTI_SPREADS = ['threeCard', 'celticCross', 'relationship', 'career', 'yesNo'];
+
+  function showSoftBanner() {
+    if (document.getElementById('tarot-soft-banner')) return;
+    if (localStorage.getItem(K_DISMISSED)) return;
+    injectStyle();
+    const b = document.createElement('div');
+    b.id = 'tarot-soft-banner';
+    b.className = 'tarot-soft-banner';
+    b.innerHTML =
+      '<div class="tsb-inner">' +
+        '<span class="tsb-moon">🌙</span>' +
+        '<span class="tsb-text">أعجبتك التجربة؟ افتح أوراكل التاروت بالكامل — ٧٨ بطاقة، ٦ نشرات، ومزيد</span>' +
+        '<a class="tsb-cta" href="' + BUY_URL + '" target="_blank" rel="noopener">احصل عليه الآن ✦</a>' +
+        '<button class="tsb-close" aria-label="إغلاق">✕</button>' +
+      '</div>';
+    document.body.appendChild(b);
+    b.querySelector('.tsb-close').addEventListener('click', function () {
+      b.remove();
+      localStorage.setItem(K_DISMISSED, '1');
+    });
+  }
+
+  // Exposed so app.js can call GateTracker.recordReading(spreadId) after each full reading
+  window.GateTracker = {
+    recordReading: function (spreadId) {
+      if (!spreadId || !MULTI_SPREADS.includes(spreadId)) return;
+      if (isActivated() || isLegacy()) return;
+      const count = parseInt(localStorage.getItem(K_COUNT) || '0', 10) + 1;
+      localStorage.setItem(K_COUNT, String(count));
+      if (count >= FREE_READINGS) showSoftBanner();
+    }
+  };
+
   // ── Email capture: starts the trial + sends the email to you via Formsubmit ──
   function showEmailGate() {
     if (document.getElementById('tarot-gate')) return;
@@ -256,15 +311,11 @@
   }
 
   function evaluate() {
-    if (!GATE_ENABLED) return;          // paywall paused — app stays fully open
     initState();
-    if (isLegacy() || isActivated()) return;   // grandfathered or already unlocked → full access
-    if (!localStorage.getItem(K_TRIAL)) {       // trial not started yet
-      if (!localStorage.getItem(K_EMAIL)) { showEmailGate(); return; }  // capture email first → starts trial
-      localStorage.setItem(K_TRIAL, String(Date.now()));                // safety fallback
-    }
-    if (trialActive()) showTrialBadge();
-    else showGate();
+    if (isLegacy() || isActivated()) return;   // paid/grandfathered → full access, never show banner
+    // Show banner on page load if user has already hit the threshold
+    const count = parseInt(localStorage.getItem(K_COUNT) || '0', 10);
+    if (count >= FREE_READINGS) showSoftBanner();
   }
 
   if (document.readyState === 'loading') {

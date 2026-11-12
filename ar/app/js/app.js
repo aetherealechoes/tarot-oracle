@@ -882,6 +882,8 @@ const App = {
   showReadingSummary(fullInterpretation) {
     const panel = document.getElementById('reading-summary-panel');
     if (!panel) return;
+    // Track full-spread readings for soft-banner threshold
+    if (window.GateTracker) window.GateTracker.recordReading(this.currentReading?.spread?.id);
 
     // Sanitize: strip any NaN/undefined artifacts from generated text
     const _sanitize = (text) => {
