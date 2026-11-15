@@ -256,10 +256,19 @@
   const FREE_READINGS = 7;
   const MULTI_SPREADS = ['threeCard', 'celticCross', 'relationship', 'career', 'yesNo'];
 
+  // Helper: fire GA4 event safely
+  function ga4(eventName, params) {
+    if (typeof gtag === 'function') {
+      gtag('event', eventName, params || {});
+    }
+  }
+
   function showSoftBanner() {
     if (document.getElementById('tarot-soft-banner')) return;
     if (localStorage.getItem(K_DISMISSED)) return;
     injectStyle();
+    const buyUrl = getBuyUrl();
+    const src = detectSource();
     const b = document.createElement('div');
     b.id = 'tarot-soft-banner';
     b.className = 'tarot-soft-banner';
@@ -267,13 +276,19 @@
       '<div class="tsb-inner">' +
         '<span class="tsb-moon">🌙</span>' +
         '<span class="tsb-text">أعجبتك التجربة؟ افتح أوراكل التاروت بالكامل — ٧٨ بطاقة، ٦ نشرات، ومزيد</span>' +
-        '<a class="tsb-cta" href="' + getBuyUrl() + '" target="_blank" rel="noopener">احصل عليه الآن ✦</a>' +
+        '<a class="tsb-cta" href="' + buyUrl + '" target="_blank" rel="noopener">احصل عليه الآن ✦</a>' +
         '<button class="tsb-close" aria-label="إغلاق">✕</button>' +
       '</div>';
     document.body.appendChild(b);
+    ga4('banner_shown', { traffic_source: src });
+    b.querySelector('.tsb-cta').addEventListener('click', function () {
+      ga4('purchase_intent', { traffic_source: src, destination: buyUrl });
+      ga4('banner_clicked', { traffic_source: src });
+    });
     b.querySelector('.tsb-close').addEventListener('click', function () {
       b.remove();
       localStorage.setItem(K_DISMISSED, '1');
+      ga4('banner_dismissed', { traffic_source: src });
     });
   }
 
@@ -284,6 +299,7 @@
       if (isActivated() || isLegacy()) return;
       const count = parseInt(localStorage.getItem(K_COUNT) || '0', 10) + 1;
       localStorage.setItem(K_COUNT, String(count));
+      ga4('reading_completed', { spread_id: spreadId, reading_number: count });
       if (count >= FREE_READINGS) showSoftBanner();
     }
   };
