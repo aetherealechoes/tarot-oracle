@@ -17,7 +17,7 @@
   const PREFIX     = 'TAROT';
   const BUY_URL_INSTA  = 'https://etherealjournals.gumroad.com/l/tarot-oracle-ar/INSTA';
   const BUY_URL_TIKTOK = 'https://etherealjournals.gumroad.com/l/tarot-oracle-ar?offer_code=TIKTOK';
-  const BUY_URL_DEFAULT= 'https://etherealjournals.gumroad.com/l/tarot-oracle-ar/INSTA';
+  const BUY_URL_DEFAULT= 'https://etherealjournals.gumroad.com/l/tarot-oracle-ar';
 
   // Detect traffic source from UTM params or referrer, persist it
   function detectSource() {
@@ -275,7 +275,7 @@
     b.innerHTML =
       '<div class="tsb-inner">' +
         '<span class="tsb-moon">🌙</span>' +
-        '<span class="tsb-text">أعجبتك التجربة؟ افتح أوراكل التاروت بالكامل — ٧٨ بطاقة، ٦ نشرات، ومزيد</span>' +
+        '<span class="tsb-text">أعجبتك التجربة؟ افتح أوراكل التاروت بالكامل — ٧٨ بطاقة، ٦ نشرات، و أكثر &nbsp;<s style="opacity:.6">$44.44</s> <strong style="color:#e8c547">$20 فقط</strong></span>' +
         '<a class="tsb-cta" href="' + buyUrl + '" target="_blank" rel="noopener">احصل عليه الآن ✦</a>' +
         '<button class="tsb-close" aria-label="إغلاق">✕</button>' +
       '</div>';
