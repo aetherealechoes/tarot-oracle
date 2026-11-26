@@ -212,6 +212,7 @@
       '</div>';
     document.body.appendChild(o);
     document.body.style.overflow = 'hidden';
+    ga4('upgrade_shown', { trigger: fromEmail ? 'key_entry' : 'trial_ended', lang: (window.I18N && window.I18N.currentLang) || 'ar' });
     document.getElementById('tarot-gate-submit').addEventListener('click', tryKey);
     const inp = document.getElementById('tarot-gate-input');
     inp.addEventListener('keydown', function (e) { if (e.key === 'Enter') tryKey(); });
@@ -280,26 +281,32 @@
         '<button class="tsb-close" aria-label="إغلاق">✕</button>' +
       '</div>';
     document.body.appendChild(b);
-    ga4('banner_shown', { traffic_source: src });
+    const _lang = (window.I18N && window.I18N.currentLang) || 'ar';
+    ga4('banner_shown', { traffic_source: src, banner_id: 'soft-banner-v1', lang: _lang });
     b.querySelector('.tsb-cta').addEventListener('click', function () {
-      ga4('purchase_intent', { traffic_source: src, destination: buyUrl });
-      ga4('banner_clicked', { traffic_source: src });
+      ga4('gumroad_click', { traffic_source: src, product: 'tarot-oracle-ar', offer_code: src === 'instagram' ? 'INSTA' : src === 'tiktok' ? 'TIKTOK' : '', lang: _lang });
+      ga4('purchase_intent', { traffic_source: src, destination: buyUrl, banner_id: 'soft-banner-v1', lang: _lang });
+      ga4('banner_clicked', { traffic_source: src, banner_id: 'soft-banner-v1', lang: _lang });
     });
     b.querySelector('.tsb-close').addEventListener('click', function () {
       b.remove();
       localStorage.setItem(K_DISMISSED, '1');
-      ga4('banner_dismissed', { traffic_source: src });
+      ga4('banner_dismissed', { traffic_source: src, banner_id: 'soft-banner-v1', lang: _lang });
     });
   }
 
-  // Exposed so app.js can call GateTracker.recordReading(spreadId) after each full reading
+  // Exposed so app.js can call GateTracker.recordReading(spreadId, extraParams) after each full reading
   window.GateTracker = {
-    recordReading: function (spreadId) {
+    recordReading: function (spreadId, extraParams) {
       if (!spreadId || !MULTI_SPREADS.includes(spreadId)) return;
       if (isActivated() || isLegacy()) return;
       const count = parseInt(localStorage.getItem(K_COUNT) || '0', 10) + 1;
       localStorage.setItem(K_COUNT, String(count));
-      ga4('reading_completed', { spread_id: spreadId, reading_number: count });
+      const lang = (window.I18N && window.I18N.currentLang) || 'ar';
+      ga4('reading_completed', Object.assign(
+        { spread_id: spreadId, spread_type: spreadId, reading_number: count, lang: lang },
+        extraParams || {}
+      ));
       if (count >= FREE_READINGS) showSoftBanner();
     }
   };
@@ -341,6 +348,7 @@
       } catch (e) {}
       localStorage.setItem(K_EMAIL, email);
       localStorage.setItem(K_TRIAL, String(Date.now()));
+      ga4('trial_started', { lang: (window.I18N && window.I18N.currentLang) || 'ar' });
       unlockFully();
       showTrialBadge();
     }
@@ -352,6 +360,15 @@
   }
 
   function evaluate() {
+    // Internal traffic detection: ?internal=1 → persist flag + configure GA4
+    const _params = new URLSearchParams(window.location.search);
+    if (_params.get('internal') === '1') {
+      localStorage.setItem('ee_internal', '1');
+    }
+    if (localStorage.getItem('ee_internal') === '1' && typeof gtag === 'function') {
+      gtag('config', 'G-SDNTJ0G5DP', { traffic_type: 'internal' });
+    }
+
     initState();
     if (isLegacy() || isActivated()) return;   // paid/grandfathered → full access, never show banner
     // Show banner on page load if user has already hit the threshold

@@ -18,6 +18,11 @@ const App = {
     // Initialize internationalization
     I18N.init();
 
+    // GA4: app opened
+    if (typeof gtag === 'function') {
+      gtag('event', 'app_open', { lang: I18N.currentLang || 'ar' });
+    }
+
     // Build the 78-card deck
     this.buildDeck();
 
@@ -672,6 +677,14 @@ const App = {
     this.currentReading = reading;
     this.revealedCount = 0;
 
+    // GA4: reading started
+    if (typeof gtag === 'function') {
+      gtag('event', 'reading_started', {
+        spread_type: spreadId,
+        lang: I18N.currentLang || 'ar'
+      });
+    }
+
     // Build user profile data for interpretation
     const today = new Date();
     const dailyEnergy = Celestial.getDailyEnergy(today);
@@ -825,6 +838,16 @@ const App = {
 
       this.revealedCount++;
 
+      // GA4: card drawn/revealed
+      if (typeof gtag === 'function') {
+        gtag('event', 'card_drawn', {
+          card_name: cardName,
+          position: index,
+          spread_type: this.currentReading?.spread?.id || '',
+          lang: I18N.currentLang || 'ar'
+        });
+      }
+
       // Show interpretation below this card
       const interpreted = this.currentInterpretation.cards[index];
       if (interpreted) {
@@ -882,8 +905,11 @@ const App = {
   showReadingSummary(fullInterpretation) {
     const panel = document.getElementById('reading-summary-panel');
     if (!panel) return;
-    // Track full-spread readings for soft-banner threshold
-    if (window.GateTracker) window.GateTracker.recordReading(this.currentReading?.spread?.id);
+    // Track full-spread readings for soft-banner threshold (passes card_count + lang for GA4)
+    if (window.GateTracker) window.GateTracker.recordReading(
+      this.currentReading?.spread?.id,
+      { card_count: this.currentReading?.cards?.length || 0, lang: I18N.currentLang || 'ar' }
+    );
 
     // Sanitize: strip any NaN/undefined artifacts from generated text
     const _sanitize = (text) => {
